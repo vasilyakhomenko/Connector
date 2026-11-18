@@ -252,7 +252,8 @@ url: https://example.com
 
     private suspend fun searchDuckDuckGo(query: String): String = withContext(Dispatchers.IO) {
         try {
-            val url = "https://api.duckduckgo.com/?q=${java.net.URLEncoder.encode(query, \"UTF-8\")}&format=json&no_html=1&skip_disambig=1"
+            val encoded = java.net.URLEncoder.encode(query, Charsets.UTF_8.name())
+            val url = "https://api.duckduckgo.com/?q=$encoded&format=json&no_html=1&skip_disambig=1"
             val request = okhttp3.Request.Builder().url(url).build()
             val body = okhttp3.OkHttpClient().newCall(request).execute().body?.string() ?: ""
             val element = Json { ignoreUnknownKeys = true }.parseToJsonElement(body).jsonObject
