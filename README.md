@@ -1,65 +1,31 @@
 # Connector
 
-Нативный Android-клиент для ИИ-моделей.  
-Kotlin · Jetpack Compose · Material 3
+Android-приложение с **оригинальным интерфейсом** Connector.
 
-Работает с **Anthropic, OpenAI, OpenRouter, DeepSeek, Groq, xAI** и любым OpenAI-совместимым API.  
-CORS не нужен — запросы идут напрямую.
+Kotlin-оболочка + WebView → UI **один в один** с исходным клиентом (проекты, чаты, настройки, tool-calling).
 
----
+## Сборка
 
-## Возможности
+### Android Studio
+1. Открой репозиторий
+2. Положите `chat.html` в `app/src/main/assets/` (файл из zip / artifacts)
+3. ▶ Run
 
-- Стриминг ответов (SSE)
-- История чатов (локально, DataStore)
-- Системный промпт
-- Инструменты: поиск DuckDuckGo + чтение страниц
-- Тёмная / светлая тема
-- Material 3 интерфейс
+### GitHub Actions
+**Actions → Build APK → Download artifact**
 
----
+## Важно
 
-## Быстрый старт
+- Интерфейс **идентичен** первому видео: проекты, сайдбар, composer, настройки
+- Anthropic работает напрямую
+- Для остальных моделей укажите CORS Worker в настройках
 
-### Вариант A — Android Studio (рекомендуется)
+## Структура
 
-1. Склонируй репозиторий:
-   ```bash
-   git clone https://github.com/vasilyakhomenko/Connector.git
-   cd Connector
-   ```
-2. Открой папку в **Android Studio**
-3. Дождись синхронизации Gradle
-4. Нажми ▶ Run
-
-### Вариант B — командная строка
-
-```bash
-chmod +x gradlew
-./gradlew assembleDebug
-```
-
-APK появится здесь:
-```
-app/build/outputs/apk/debug/app-debug.apk
-```
-
----
-
-## GitHub Actions
-
-При каждом push в `main` автоматически собирается debug-APK.  
-Скачать: **Actions → последняя успешная сборка → Artifacts → Connector-debug**.
-
----
-
-## Требования
-
-- Android 8.0+ (API 26)
-- Android Studio Ladybug (2024.2+) или новее
-- JDK 17
-
----
+| Файл | Назначение |
+|------|------------|
+| `MainActivity.kt` | WebView, `file:///android_asset/chat.html` |
+| `app/src/main/assets/chat.html` | Оригинальный UI |
 
 ## Лицензия
 
