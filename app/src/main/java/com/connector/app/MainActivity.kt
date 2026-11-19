@@ -23,6 +23,8 @@ import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
@@ -81,9 +83,10 @@ class MainActivity : ComponentActivity() {
             }
             webChromeClient = WebChromeClient()
             setBackgroundColor(0xFFFAFAFA.toInt())
-            loadUrl("file:///android_asset/chat.html")
         }
         setContentView(webView)
+
+        loadUi()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -92,15 +95,59 @@ class MainActivity : ComponentActivity() {
         })
     }
 
+    private fun loadUi() {
+        val html = readAsset("chat.html") ?: embeddedHtml()
+        if (html != null && !html.contains("PLACEHOLDER_WILL_FAIL")) {
+            webView.loadDataWithBaseURL(
+                "file:///android_asset/",
+                html,
+                "text/html",
+                "utf-8",
+                null
+            )
+        } else {
+            val msg = """
+                <!doctype html><html><head><meta charset=\"utf-8\">
+                <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
+                <style>body{font-family:system-ui;padding:24px;background:#fafafa;color:#111}
+                code{background:#eee;padding:2px 6px;border-radius:6px}</style></head>
+                <body>
+                <h2>Нет файла chat.html</h2>
+                <p>Скопируйте <code>chat.html</code> в <code>app/src/main/assets/</code> из zip и пересоберите.</p>
+                </body></html>
+            """.trimIndent()
+            webView.loadDataWithBaseURL(null, msg, "text/html", "utf-8", null)
+        }
+    }
+
+    private fun readAsset(name: String): String? {
+        return try {
+            assets.open(name).use { input ->
+                BufferedReader(InputStreamReader(input, Charsets.UTF_8)).readText()
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun embeddedHtml(): String? {
+        return try {
+            val b64 = EmbeddedChat.GZ_B64_PARTS.joinToString("")
+            val gz = android.util.Base64.decode(b64, android.util.Base64.DEFAULT)
+            java.util.zip.GZIPInputStream(java.io.ByteArrayInputStream(gz))
+                .bufferedReader(Charsets.UTF_8).readText()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun js(code: String) {
         mainHandler.post {
             webView.evaluateJavascript(code, null)
         }
     }
 
-    private fun escapeJs(s: String): String {
-        return JSONObject.quote(s)
-    }
+    private fun escapeJs(s: String): String = JSONObject.quote(s)
 
     inner class NativeBridge {
 
@@ -199,6 +246,33 @@ class MainActivity : ComponentActivity() {
                 } catch (e: Exception) {
                     js(
                         "window.__nativeStreamError && window.__nativeStreamError(" +
+                            "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
+                    )
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun httpGetHeaders(requestId: String, url: String, headersJson: String) {
+            thread {
+                try {
+                    val headers = JSONObject(headersJson)
+                    val builder = Request.Builder().url(url)
+                    val keys = headers.keys()
+                    while (keys.hasNext()) {
+                        val k = keys.next()
+                        builder.header(k, headers.getString(k))
+                    }
+                    httpClient.newCall(builder.build()).execute().use { response ->
+                        val respBody = response.body?.string() ?: ""
+                        js(
+                            "window.__nativeHttpDone && window.__nativeHttpDone(" +
+                                "${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})"
+                        )
+                    }
+                } catch (e: Exception) {
+                    js(
+                        "window.__nativeHttpError && window.__nativeHttpError(" +
                             "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
                     )
                 }
