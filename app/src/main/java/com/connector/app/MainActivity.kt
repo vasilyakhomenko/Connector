@@ -85,7 +85,6 @@ class MainActivity : ComponentActivity() {
             setBackgroundColor(0xFFFAFAFA.toInt())
         }
         setContentView(webView)
-
         loadUi()
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -96,8 +95,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadUi() {
-        val html = readAsset("chat.html") ?: embeddedHtml()
-        if (html != null && !html.contains("PLACEHOLDER_WILL_FAIL")) {
+        val html = readAsset("chat.html")
+        if (html != null && html.length > 2000 && !html.contains("PLACEHOLDER")) {
             webView.loadDataWithBaseURL(
                 "file:///android_asset/",
                 html,
@@ -106,17 +105,22 @@ class MainActivity : ComponentActivity() {
                 null
             )
         } else {
-            val msg = """
-                <!doctype html><html><head><meta charset=\"utf-8\">
-                <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
-                <style>body{font-family:system-ui;padding:24px;background:#fafafa;color:#111}
-                code{background:#eee;padding:2px 6px;border-radius:6px}</style></head>
-                <body>
-                <h2>Нет файла chat.html</h2>
-                <p>Скопируйте <code>chat.html</code> в <code>app/src/main/assets/</code> из zip и пересоберите.</p>
-                </body></html>
-            """.trimIndent()
-            webView.loadDataWithBaseURL(null, msg, "text/html", "utf-8", null)
+            webView.loadDataWithBaseURL(
+                null,
+                """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font-family:system-ui;padding:24px;background:#fafafa;color:#111;line-height:1.5}
+code{background:#eee;padding:2px 6px;border-radius:6px}</style></head>
+<body>
+<h2>Нужен chat.html</h2>
+<p>Скопируйте полный файл из архива <b>ConnectorApp-native-bridge.zip</b> в:</p>
+<p><code>app/src/main/assets/chat.html</code></p>
+<p>Затем: Build → Rebuild Project.</p>
+</body></html>""".trimIndent(),
+                "text/html",
+                "utf-8",
+                null
+            )
         }
     }
 
@@ -130,27 +134,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun embeddedHtml(): String? {
-        return try {
-            val b64 = EmbeddedChat.GZ_B64_PARTS.joinToString("")
-            val gz = android.util.Base64.decode(b64, android.util.Base64.DEFAULT)
-            java.util.zip.GZIPInputStream(java.io.ByteArrayInputStream(gz))
-                .bufferedReader(Charsets.UTF_8).readText()
-        } catch (_: Exception) {
-            null
-        }
-    }
-
     private fun js(code: String) {
-        mainHandler.post {
-            webView.evaluateJavascript(code, null)
-        }
+        mainHandler.post { webView.evaluateJavascript(code, null) }
     }
 
     private fun escapeJs(s: String): String = JSONObject.quote(s)
 
     inner class NativeBridge {
-
         @JavascriptInterface
         fun httpPost(requestId: String, url: String, headersJson: String, body: String) {
             thread {
@@ -165,16 +155,10 @@ class MainActivity : ComponentActivity() {
                     }
                     httpClient.newCall(builder.build()).execute().use { response ->
                         val respBody = response.body?.string() ?: ""
-                        js(
-                            "window.__nativeHttpDone && window.__nativeHttpDone(" +
-                                "${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})"
-                        )
+                        js("window.__nativeHttpDone && window.__nativeHttpDone(${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})")
                     }
                 } catch (e: Exception) {
-                    js(
-                        "window.__nativeHttpError && window.__nativeHttpError(" +
-                            "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
-                    )
+                    js("window.__nativeHttpError && window.__nativeHttpError(${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})")
                 }
             }
         }
@@ -192,62 +176,30 @@ class MainActivity : ComponentActivity() {
                         builder.header(k, headers.getString(k))
                     }
                     val request = builder.build()
-
                     val listener = object : EventSourceListener() {
-                        override fun onEvent(
-                            eventSource: EventSource,
-                            id: String?,
-                            type: String?,
-                            data: String
-                        ) {
+                        override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
                             if (data == "[DONE]") {
                                 streams.remove(requestId)
                                 eventSource.cancel()
                                 js("window.__nativeStreamDone && window.__nativeStreamDone(${escapeJs(requestId)})")
                                 return
                             }
-                            js(
-                                "window.__nativeStreamChunk && window.__nativeStreamChunk(" +
-                                    "${escapeJs(requestId)}, ${escapeJs(data)})"
-                            )
+                            js("window.__nativeStreamChunk && window.__nativeStreamChunk(${escapeJs(requestId)}, ${escapeJs(data)})")
                         }
-
-                        override fun onFailure(
-                            eventSource: EventSource,
-                            t: Throwable?,
-                            response: Response?
-                        ) {
+                        override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
                             streams.remove(requestId)
-                            val msg = buildString {
-                                append(t?.message ?: "Stream error")
-                                if (response != null) {
-                                    append(" (HTTP ${response.code})")
-                                    try {
-                                        val b = response.body?.string()?.take(300)
-                                        if (!b.isNullOrBlank()) append("\n$b")
-                                    } catch (_: Exception) {}
-                                }
-                            }
-                            js(
-                                "window.__nativeStreamError && window.__nativeStreamError(" +
-                                    "${escapeJs(requestId)}, ${escapeJs(msg)})"
-                            )
+                            val msg = (t?.message ?: "Stream error") + (response?.let { " (HTTP ${it.code})" } ?: "")
+                            js("window.__nativeStreamError && window.__nativeStreamError(${escapeJs(requestId)}, ${escapeJs(msg)})")
                         }
-
                         override fun onClosed(eventSource: EventSource) {
                             if (streams.remove(requestId) != null) {
                                 js("window.__nativeStreamDone && window.__nativeStreamDone(${escapeJs(requestId)})")
                             }
                         }
                     }
-
-                    val es = EventSources.createFactory(httpClient).newEventSource(request, listener)
-                    streams[requestId] = es
+                    streams[requestId] = EventSources.createFactory(httpClient).newEventSource(request, listener)
                 } catch (e: Exception) {
-                    js(
-                        "window.__nativeStreamError && window.__nativeStreamError(" +
-                            "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
-                    )
+                    js("window.__nativeStreamError && window.__nativeStreamError(${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})")
                 }
             }
         }
@@ -265,16 +217,10 @@ class MainActivity : ComponentActivity() {
                     }
                     httpClient.newCall(builder.build()).execute().use { response ->
                         val respBody = response.body?.string() ?: ""
-                        js(
-                            "window.__nativeHttpDone && window.__nativeHttpDone(" +
-                                "${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})"
-                        )
+                        js("window.__nativeHttpDone && window.__nativeHttpDone(${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})")
                     }
                 } catch (e: Exception) {
-                    js(
-                        "window.__nativeHttpError && window.__nativeHttpError(" +
-                            "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
-                    )
+                    js("window.__nativeHttpError && window.__nativeHttpError(${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})")
                 }
             }
         }
@@ -294,16 +240,10 @@ class MainActivity : ComponentActivity() {
                         .build()
                     httpClient.newCall(request).execute().use { response ->
                         val respBody = response.body?.string() ?: ""
-                        js(
-                            "window.__nativeHttpDone && window.__nativeHttpDone(" +
-                                "${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})"
-                        )
+                        js("window.__nativeHttpDone && window.__nativeHttpDone(${escapeJs(requestId)}, ${response.code}, ${escapeJs(respBody)})")
                     }
                 } catch (e: Exception) {
-                    js(
-                        "window.__nativeHttpError && window.__nativeHttpError(" +
-                            "${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})"
-                    )
+                    js("window.__nativeHttpError && window.__nativeHttpError(${escapeJs(requestId)}, ${escapeJs(e.message ?: "Network error")})")
                 }
             }
         }
