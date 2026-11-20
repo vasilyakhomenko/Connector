@@ -1,0 +1,1665 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Connector">
+<meta name="application-name" content="Connector">
+<meta name="description" content="Локальный клиент для ИИ-моделей">
+<title>Connector</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+<style>
+:root{--bg:#fafafa;--tx:#0a0a0a;--mu:#71717a;--gl:rgba(255,255,255,.66);--dg:rgba(255,255,255,.96);--bd:rgba(0,0,0,.09);--hv:rgba(0,0,0,.06);--ink:#0a0a0a;--on:#fff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#09090b;--tx:#fafafa;--mu:#a1a1aa;--gl:rgba(30,30,34,.52);--dg:rgba(28,28,32,.95);--bd:rgba(255,255,255,.1);--hv:rgba(255,255,255,.08);--ink:#fafafa;--on:#09090b;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:flex;color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+ background:radial-gradient(55% 45% at 12% 0%,rgba(127,127,127,.14),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(127,127,127,.11),transparent 70%),var(--bg);background-attachment:fixed}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.gl,dialog{background:var(--gl);-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5);border:1px solid var(--bd)}
+#side{width:300px;flex:none;display:flex;flex-direction:column;padding:18px 14px 14px;border-width:0 1px 0 0;border-radius:0 30px 30px 0;background:var(--dg);z-index:30}
+.logo{font:700 28px system-ui;letter-spacing:-.03em}
+.nb{display:flex;justify-content:space-between;width:100%;text-align:left;padding:9px 11px;border-radius:12px;font-size:14.5px}
+.nb:hover,.ci:hover,.ci.on{background:var(--hv)}
+.nb.main{background:var(--ink);color:var(--on);font-weight:600;margin-bottom:4px}
+.nb.main:hover{background:var(--ink);opacity:.88}
+#list{overflow:auto;flex:1;margin-top:10px}
+.ci{display:flex;align-items:center;border-radius:14px;padding:12px;cursor:pointer;gap:6px}
+.ci span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px}
+.ci button{color:var(--mu)}
+.ci.in{margin-left:12px}
+.ph{display:flex;align-items:center;gap:2px;padding:10px 6px 4px 11px;font-size:12.5px;font-weight:600;color:var(--mu)}
+.ph span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sh{display:flex;align-items:center;justify-content:space-between;padding:0 4px 16px 10px}
+.rd{width:44px;height:44px;border-radius:50%;border:1px solid var(--bd);background:var(--hv);display:grid;place-items:center}
+#q{width:100%;padding:10px 14px;margin:0 0 8px;border:1px solid var(--bd);border-radius:99px;background:var(--hv);color:inherit;font:16px system-ui;outline:0}
+.nv{display:flex;align-items:center;gap:16px;width:100%;padding:12px 10px;border-radius:14px;font-size:17px;font-weight:500;text-align:left}
+.nv:hover,.nv.on{background:var(--hv)}
+hr{border:0;height:1px;background:var(--bd);margin:10px 8px}
+#new{width:54px;height:54px;border-radius:50%;background:var(--ink);color:var(--on);display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.22);flex:none;margin-top:10px}
+.ph2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}
+.pt{font:700 28px/1.2 system-ui;letter-spacing:-.03em;margin:12px 0 6px}
+.ph2 .pt{margin:0}
+.card{padding:14px 16px;border-radius:18px;margin:10px 0;cursor:pointer}
+.card b{display:block}
+.card small,.muted{color:var(--mu);font-size:14px}
+.pl{padding:9px 16px;border-radius:99px;border:1px solid var(--bd);font-weight:600;font-size:14px}
+.pl:hover{background:var(--hv)}
+.pl.p{background:var(--ink);color:var(--on);border-color:transparent}
+@media(min-width:761px){#menu{display:none}}
+.ci{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.tabs{display:flex;gap:6px;margin:8px 0 10px}
+.tab{flex:1;padding:9px;border-radius:99px;font-weight:600;font-size:14px;color:var(--mu)}
+.tab.on{background:var(--hv);color:var(--tx)}
+#pm .pl{margin-bottom:4px}
+#pm .pt{font-size:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cm{width:min(320px,88vw)}
+#cm .nv{font-size:16px}
+#cm .pri{margin-top:10px;width:100%}
+.vh{position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;overflow:hidden}
+.cmt{display:block;padding:2px 10px 10px;color:var(--mu);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+#msgs{flex:1;overflow:auto;padding:8px 16px 16px;min-height:0}
+header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:transparent}
+#ttl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mu);font-size:14px}
+.ib{width:38px;height:38px;border-radius:12px;font-size:19px;display:grid;place-items:center;flex:none}
+.ib:hover{background:var(--hv)}
+.ib.on{background:var(--ink);color:var(--on)}
+.chip{font-size:13px;color:var(--mu);padding:6px 12px;border-radius:99px;border:1px solid var(--bd);max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip:hover{background:var(--hv)}
+#inner{max-width:760px;margin:0 auto}
+.hello{text-align:center;margin-top:min(18vh, 120px);font:600 34px/1.15 system-ui;letter-spacing:-.03em}
+.hello small{display:block;font:400 15px system-ui;letter-spacing:0;color:var(--mu);margin-top:12px}
+.m{margin:20px 0}
+.m.u{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.bub{background:var(--hv);border:1px solid var(--bd);padding:10px 15px;border-radius:20px 20px 6px 20px;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+.cf{font-size:12px;color:var(--mu);border:1px solid var(--bd);border-radius:99px;padding:2px 10px;background:var(--hv)}
+.md{overflow-wrap:anywhere;line-height:1.7}
+.md p{margin:.6em 0}.md h1,.md h2,.md h3{line-height:1.25;margin:1.1em 0 .4em;letter-spacing:-.02em}
+.md code{font:13.5px ui-monospace,Menlo,Consolas,monospace;background:var(--hv);padding:1px 6px;border-radius:6px}
+.md pre{background:var(--hv);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin:.8em 0;padding:0}
+.md pre code{display:block;padding:12px 14px;overflow-x:auto;background:none;line-height:1.5;border-radius:0}
+.md table{border-collapse:collapse;display:block;overflow-x:auto}
+.md td,.md th{border:1px solid var(--bd);padding:5px 10px}
+.md blockquote{margin:.6em 0;padding-left:14px;border-left:2px solid var(--mu);color:var(--mu)}
+.md a{color:inherit;text-decoration:underline}
+.cb{display:flex;align-items:center;gap:4px;padding:4px 6px 4px 14px;font:12px system-ui;color:var(--mu);border-bottom:1px solid var(--bd)}
+.cb span{flex:1}
+.sb{font:13px system-ui;color:var(--mu);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.sb:hover{background:var(--hv);color:var(--tx)}
+.acts{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
+.svgf{margin:.8em 0;padding:0}
+.svgf img,.svgf svg{display:block;max-width:100%!important;width:100%;height:auto!important;max-height:min(70vh,520px);margin:0 auto;background:#fff;border:1px solid var(--bd);border-radius:16px;object-fit:contain}
+.svgf pre{margin:6px 0 0}
+.wait{color:var(--mu)}
+.thinking{display:inline-flex;align-items:center;gap:10px;padding:4px 2px;color:var(--mu);font-size:14.5px;position:relative}
+.thinking .txt{opacity:.9;letter-spacing:.01em}
+.thinking .dots{display:inline-flex;gap:5px;align-items:center;height:14px}
+.thinking .dots i{
+  width:6px;height:6px;border-radius:50%;background:currentColor;
+  opacity:.3;animation:think-bounce 1.2s infinite ease-in-out both;
+}
+.thinking .dots i:nth-child(1){animation-delay:0s}
+.thinking .dots i:nth-child(2){animation-delay:.15s}
+.thinking .dots i:nth-child(3){animation-delay:.3s}
+@keyframes think-bounce{
+  0%,80%,100%{transform:translateY(0) scale(.85);opacity:.25}
+  40%{transform:translateY(-6px) scale(1);opacity:1}
+}
+.thinking::after{
+  content:'';position:absolute;inset:-6px -12px;border-radius:99px;
+  background:var(--hv);opacity:0;animation:think-glow 2.4s ease-in-out infinite;z-index:-1;pointer-events:none
+}
+@keyframes think-glow{0%,100%{opacity:0}50%{opacity:.75}}
+/* #comp layout handled in Fixed app shell */
+#in{width:100%;border:0;outline:0;resize:none;background:none;color:inherit;font:18px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:4px 8px;max-height:200px}
+#atts{display:flex;flex-wrap:wrap;gap:6px;padding:0 6px}
+#atts .cf{cursor:pointer}
+.row{display:flex;align-items:center;gap:2px}
+#go{margin-left:4px;width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--on);display:grid;place-items:center}
+dialog{color:var(--tx);background:var(--dg);border-radius:22px;padding:20px;width:min(520px,94vw);max-height:calc(100dvh - 32px);overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.3)}
+label{display:block;font-size:13px;color:var(--mu);margin:12px 0 4px}
+dialog input:not([type=checkbox]),dialog select,dialog textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--hv);color:inherit;font:15px system-ui;outline:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:16px}
+.pri{background:var(--ink);color:var(--on);padding:9px 18px;border-radius:99px;font-weight:600}
+.pfi{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.pfi span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#art{width:min(900px,96vw);height:86vh;padding:0;overflow:hidden}
+#art[open]{display:flex;flex-direction:column}
+.ah{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--bd)}
+#art iframe{flex:1;border:0;background:#fff;width:100%}
+#scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40}
+@media(max-width:760px){
+#side{position:fixed;inset:0 auto 0 0;z-index:50;transform:translateX(-100%);transition:transform .2s;padding-top:calc(18px + env(safe-area-inset-top,0));padding-bottom:calc(14px + env(safe-area-inset-bottom,0));width:min(320px,84vw)}
+#side.open{transform:none}
+#scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:20}
+.hello{font-size:28px}}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .thinking .dots i{opacity:.55;transform:none}
+  .thinking::after{display:none}
+}
+
+/* MCP Connectors + Library */
+.conn-list{display:flex;flex-direction:column;gap:12px;margin-top:4px;padding-bottom:24px}
+.conn-card{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--bd);border-radius:18px;background:var(--dg)}
+.conn-top{display:flex;align-items:flex-start;gap:12px}
+.conn-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--hv);border:1px solid var(--bd);flex:none}
+.conn-icon svg{width:22px;height:22px}
+.conn-body{flex:1;min-width:0}
+.conn-name{font-weight:600;font-size:15.5px;letter-spacing:-.015em}
+.conn-status{font-size:13px;color:var(--mu);margin-top:3px;line-height:1.35}
+.conn-status.on{color:#16a34a}
+.conn-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.conn-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:99px;background:rgba(22,163,74,.12);color:#16a34a}
+.conn-badge.off{background:var(--hv);color:var(--mu);border:1px solid var(--bd)}
+.conn-sec{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mu);margin:18px 0 6px}
+#ghAuth .hint,#mcpAuth .hint{font-size:13px;color:var(--mu);line-height:1.45;margin:8px 0 0}
+#ghAuth a,#mcpAuth a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.nv.on{background:var(--hv);color:var(--tx)}
+
+
+/* Boot animation */
+body{animation:bootIn .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bootIn{to{opacity:1}}
+.viz-frame{width:100%;max-width:100%;border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin:10px 0;background:#fff}
+.viz-frame iframe{width:100%;border:0;display:block;min-height:280px;background:#fff}
+.viz-bar{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--hv);font-size:12.5px;color:var(--mu)}
+.viz-bar button{font-size:12.5px;padding:4px 10px;border-radius:99px;border:1px solid var(--bd)}
+.viz-bar button:hover{background:var(--dg)}
+
+
+/* Tool / thinking blocks */
+.tool-block,.think-block{
+  margin:10px 0;padding:10px 14px;border-radius:14px;border:1px solid var(--bd);
+  background:var(--hv);color:var(--mu);font-size:13.5px;line-height:1.45;
+}
+.tool-block summary,.think-block summary{
+  cursor:pointer;font-weight:600;color:var(--tx);list-style:none;
+  display:flex;align-items:center;gap:8px;user-select:none;
+}
+.tool-block summary::-webkit-details-marker,.think-block summary::-webkit-details-marker{display:none}
+.tool-block .body,.think-block .body{margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto}
+.tool-block .tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--dg);border:1px solid var(--bd)}
+.svgf{margin:.8em 0;padding:0;width:100%;max-width:100%;overflow:hidden}
+.svgf img,.svgf svg{
+  display:block;max-width:100%!important;width:100%;height:auto!important;
+  max-height:min(70vh,520px);margin:0 auto;background:#fff;
+  border:1px solid var(--bd);border-radius:16px;object-fit:contain;
+}
+/* Keyboard: keep layout, only lift composer */
+html,body{height:100%;overflow:hidden}
+main{height:100%;min-height:0}
+
+/* floating controls stay readable */
+/* subtle field chrome without solid panel */
+#comp-inner, 
+
+/* Fixed app shell: header + composer fixed, only #msgs scrolls */
+html,body{
+  height:100%;width:100%;margin:0;overflow:hidden;
+  position:fixed;left:0;right:0;top:0;
+  overscroll-behavior:none;
+}
+body{
+  display:flex;flex-direction:row;
+  height:var(--app-h, 100dvh);
+  max-height:var(--app-h, 100dvh);
+}
+main{
+  flex:1;display:flex;flex-direction:column;
+  min-width:0;min-height:0;height:100%;
+  overflow:hidden;position:relative;
+}
+header{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  padding-top:max(8px, env(safe-area-inset-top, 0px));
+  background:transparent;
+  position:relative;z-index:20;
+}
+#msgs{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:8px 16px 12px;
+}
+#comp{
+  flex:0 0 auto;
+  max-width:760px;
+  width:calc(100% - 24px);
+  margin:0 auto;
+  border-radius:26px;
+  padding:10px 10px 6px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);
+  margin-bottom:max(10px, env(safe-area-inset-bottom, 0px));
+  position:relative;
+  z-index:20;
+  background:var(--dg);
+}
+.tool-block .tag,.think-block .tag{
+  flex:none;white-space:nowrap;font-size:11px;padding:3px 9px;border-radius:99px;
+  background:var(--dg);border:1px solid var(--bd);line-height:1.2;
+}
+.tool-block summary,.think-block summary{
+  gap:10px;align-items:center;
+}
+.tool-block summary .q{
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-weight:500;color:var(--mu);font-size:13px;
+}
+
+
+
+.md pre{background:var(--hv);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin:.8em 0;padding:0}
+.md pre code.hljs{display:block;padding:12px 14px;overflow-x:auto;background:transparent;line-height:1.5;border-radius:0;font:13.5px ui-monospace,Menlo,Consolas,monospace}
+.cb{display:flex;align-items:center;gap:4px;padding:6px 8px 6px 14px;font:12px system-ui;color:var(--mu);border-bottom:1px solid var(--bd);background:rgba(234,88,12,.06)}
+.cb .lang{font-weight:600;color:var(--tx);opacity:.75}
+.cb .fname{color:#6366f1;font-weight:600;margin-left:6px}
+.file-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--hv);margin:6px 0;cursor:pointer}
+.file-chip:hover{background:var(--dg)}
+.file-chip b{font-weight:600}
+.lib-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--bd);border-radius:16px;margin:8px 0;background:var(--dg)}
+.lib-item .meta{flex:1;min-width:0}
+.lib-item .meta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lib-item .meta small{color:var(--mu)}
+
+
+/* Accent color in assistant replies (orange, like inline code highlights) */
+.m.a .md code{
+  color:#ea580c;
+  background:rgba(234,88,12,.10);
+  padding:1px 6px;
+  border-radius:6px;
+  font:13.5px ui-monospace,Menlo,Consolas,monospace;
+}
+.m.a .md pre code,
+.m.a .md pre code.hljs{
+  color:inherit;
+  background:transparent;
+  padding:12px 14px;
+}
+.m.a .md a{color:#ea580c;text-decoration-color:rgba(234,88,12,.45)}
+.m.a .md strong{color:#c2410c}
+.m.a .fname{color:#ea580c}
+@media(prefers-color-scheme:dark){
+  .m.a .md code{
+    color:#fb923c;
+    background:rgba(251,146,60,.12);
+  }
+  .m.a .md pre code,
+  .m.a .md pre code.hljs{color:inherit;background:transparent}
+  .m.a .md a{color:#fb923c;text-decoration-color:rgba(251,146,60,.45)}
+  .m.a .md strong{color:#fdba74}
+  .m.a .fname{color:#fb923c}
+}
+/* cb bar filename already uses accent */
+.cb .fname{color:#ea580c!important}
+@media(prefers-color-scheme:dark){
+  .cb .fname{color:#fb923c!important}
+  .cb{background:rgba(251,146,60,.08)}
+}
+
+
+/* Library cards */
+.lib-item{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px 16px;border:1px solid var(--bd);border-radius:18px;
+  margin:10px 0;background:var(--dg);
+}
+.lib-item .meta{min-width:0}
+.lib-item .meta b{
+  display:block;font-size:16px;font-weight:650;letter-spacing:-.01em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.lib-item .meta small{
+  display:block;color:var(--mu);font-size:12.5px;margin-top:4px;
+  line-height:1.35;white-space:normal;
+}
+.lib-actions{display:flex;flex-wrap:wrap;gap:8px}
+.lib-actions .sb{
+  padding:6px 12px;border:1px solid var(--bd);border-radius:99px;
+  background:var(--hv);color:var(--tx);font-size:13px;
+}
+.lib-actions .sb:hover{background:var(--dg)}
+#saveFile{max-width:min(420px,94vw)}
+#saveFile input{margin-top:2px}
+
+
+/* Transparent composer: only the input chrome is visible */
+
+/* Soft pill around the whole input without blocking content */
+
+@media(prefers-color-scheme:dark){
+  
+}
+
+
+header{
+  flex:0 0 auto !important;
+  display:flex !important;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  padding-top:max(8px, env(safe-area-inset-top, 0px));
+  background:transparent !important;
+  position:relative;
+  z-index:30;
+  min-height:48px;
+}
+header #menu, header .ib{
+  flex:0 0 auto;
+  opacity:1 !important;
+  visibility:visible !important;
+  position:relative;
+  z-index:31;
+}
+header #ttl{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+
+/* Composer never covers side menu */
+#side.open ~ main #comp,
+body.side-open #comp{
+  visibility:hidden;
+  pointer-events:none;
+}
+#side{z-index:50 !important;}
+#scrim{z-index:40 !important;}
+#comp{z-index:20;}
+header{z-index:25;}
+
+header .chip, header #mod{
+  background:color-mix(in srgb, var(--dg) 88%, transparent);
+  border:1px solid var(--bd);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+header .ib, header #menu{
+  background:color-mix(in srgb, var(--dg) 80%, transparent);
+  border-radius:99px;
+}
+@media(prefers-color-scheme:dark){
+  header .chip, header #mod{background:rgba(24,24,27,.75)}
+  header .ib, header #menu{background:rgba(24,24,27,.55)}
+}
+
+/* Single composer chrome — one frame only */
+#comp{
+  flex:0 0 auto;
+  max-width:760px;
+  width:calc(100% - 24px);
+  margin:0 auto max(10px, env(safe-area-inset-bottom, 0px));
+  border-radius:26px;
+  padding:10px 10px 6px;
+  position:relative;
+  z-index:20;
+  background:var(--dg);
+  border:1px solid var(--bd);
+  box-shadow:0 8px 28px rgba(0,0,0,.10);
+}
+@media(prefers-color-scheme:dark){
+  #comp{
+    background:rgba(24,24,27,.92);
+    border-color:rgba(255,255,255,.10);
+    box-shadow:0 8px 28px rgba(0,0,0,.35);
+  }
+}
+#comp #in, #comp .row, #comp #atts{background:transparent}
+#comp #go{box-shadow:0 4px 16px rgba(0,0,0,.18)}
+
+</style>
+</head>
+<body>
+<div id="scrim"></div>
+<aside id="side" class="gl">
+  <div class="sh"><div class="logo" data-build="20261119c">Connector</div><button class="rd" id="sb" aria-label="Поиск"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></div>
+  <input id="q" placeholder="Поиск по чатам" hidden>
+  <div id="nav">
+  <button class="nv" id="nP"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span>Проекты</span></button>
+  <button class="nv" id="nC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg><span>Коннекторы</span></button>
+  <button class="nv" id="nL"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span>Библиотека</span></button>
+  <hr></div>
+  <div id="pm" hidden></div>
+  <div id="list"></div>
+  <button id="new" aria-label="Новый чат"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+</aside>
+<main>
+  <header>
+    <button class="ib" id="menu" aria-label="Меню"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
+    <span id="ttl"></span>
+    <button class="chip" id="mod"></button>
+  </header>
+  <div id="msgs"><div id="inner"></div></div>
+  <div id="comp" class="gl">
+    <div id="atts"></div>
+    <textarea id="in" rows="1" placeholder="Задайте любой вопрос"></textarea>
+    <div class="row">
+      <button class="ib" id="att" aria-label="Прикрепить файл">+</button>
+      <button class="ib" id="web" aria-label="Веб-поиск"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg></button>
+      <span style="flex:1"></span>
+      <button id="go" aria-label="Отправить"></button>
+    </div>
+  </div>
+</main>
+<input type="file" id="file" multiple class="vh" accept="*/*">
+<input type="file" id="fileQ" multiple class="vh" accept="*/*">
+
+<dialog id="set">
+  <b style="font:700 20px system-ui;letter-spacing:-.02em">Настройки</b>
+  <label>Провайдер</label><select id="sP"></select>
+  <label>API-ключ</label><input id="sK" type="password" autocomplete="off" placeholder="sk-...">
+  <label>Модель</label><input id="sM" placeholder="Например, claude-sonnet-5-5">
+  <label>Адрес API (необязательно)</label><input id="sU" placeholder="Оставьте пустым для адреса по умолчанию">
+  <label>Инструкции для всех чатов</label><textarea id="sS" rows="3" placeholder="Например, отвечай кратко и на русском"></textarea>
+  <p class="muted" style="margin:10px 0 0;font-size:13px;line-height:1.4">Модель может сама запрашивать поиск в DuckDuckGo и чтение страниц через теги <code>&lt;web_search&gt;</code> / <code>&lt;web_fetch&gt;</code>.</p>
+  <div class="btns"><button class="sb" id="clr">Очистить чаты</button><button class="sb" id="sX">Закрыть</button><button class="pri" id="sV">Сохранить</button></div>
+</dialog>
+<dialog id="pf">
+  <b id="pT" style="font:700 20px system-ui;letter-spacing:-.02em">Проект</b><label>Название</label><input id="pN" placeholder="Например, Диплом"><label>Инструкции проекта</label><textarea id="pS" rows="3" placeholder="Как отвечать в этом проекте"></textarea>
+  <label>Файлы (доступны модели во всех чатах проекта; PDF и изображения только для Claude)</label>
+  <div id="pfl"></div><input type="file" id="fileP" multiple class="vh" accept="*/*">
+  <div class="btns"><button class="sb" id="pD">Удалить проект</button><button class="sb" id="pA">Добавить файлы</button><button class="sb" id="pX">Отмена</button><button class="pri" id="pV">Сохранить</button></div>
+</dialog>
+
+<dialog id="ghAuth">
+  <b style="font:700 20px system-ui;letter-spacing:-.02em">GitHub</b>
+  <p class="hint">Вставьте Personal Access Token. Нужны права <code>repo</code> и <code>read:user</code>.<br>
+  Создать: <a href="https://github.com/settings/tokens/new?scopes=repo,read:user&description=Connector" target="_blank" rel="noopener">github.com/settings/tokens</a></p>
+  <label>Token</label>
+  <input id="ghToken" type="password" placeholder="ghp_… или github_pat_…" autocomplete="off">
+  <p id="ghAuthErr" class="muted" style="margin:8px 0 0;color:#dc2626;font-size:13px;display:none"></p>
+  <div class="btns">
+    <button class="sb" id="ghAuthX">Отмена</button>
+    <button class="pri" id="ghAuthV">Подключить</button>
+  </div>
+</dialog>
+<dialog id="mcpAuth">
+  <b id="mcpAuthTitle" style="font:700 20px system-ui;letter-spacing:-.02em">Свой MCP</b>
+  <p class="hint">Укажите HTTP endpoint MCP-сервера (JSON-RPC). Можно добавить Bearer-токен.</p>
+  <label>Название</label>
+  <input id="mcpName" placeholder="Например, My Tools">
+  <label>URL endpoint</label>
+  <input id="mcpUrl" placeholder="https://mcp.example.com/mcp">
+  <label>Token (необязательно)</label>
+  <input id="mcpToken" type="password" placeholder="Bearer token" autocomplete="off">
+  <p id="mcpAuthErr" class="muted" style="margin:8px 0 0;color:#dc2626;font-size:13px;display:none"></p>
+  <div class="btns">
+    <button class="sb" id="mcpAuthX">Отмена</button>
+    <button class="pri" id="mcpAuthV">Сохранить</button>
+  </div>
+</dialog>
+
+<dialog id="cm"><div id="cmb"></div></dialog>
+<dialog id="art"><div class="ah"><b>Артефакт</b><button class="ib" id="aX" aria-label="Закрыть">✕</button></div><iframe sandbox="allow-scripts"></iframe></dialog>
+
+<dialog id="saveFile">
+  <b style="font:700 20px system-ui;letter-spacing:-.02em">В библиотеку</b>
+  <p class="muted" style="margin:8px 0 0;font-size:13px;line-height:1.4">Файл сохранится в разделе «Библиотека». Потом его можно открыть, скопировать или удалить.</p>
+  <label>Имя файла</label>
+  <input id="sfName" placeholder="например, hello.py" autocomplete="off">
+  <label>Язык / тип</label>
+  <input id="sfLang" placeholder="python" autocomplete="off">
+  <p id="sfErr" style="color:#dc2626;display:none;margin:8px 0 0;font-size:13px"></p>
+  <div class="btns">
+    <button class="sb" id="sfX">Отмена</button>
+    <button class="pri" id="sfV">Сохранить</button>
+  </div>
+</dialog>
+<script>
+const $=s=>document.querySelector(s);
+const TRI='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg>';
+const SQ='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+
+function md(t){
+  try{
+    let src=String(t||'');
+    if(window.marked && marked.setOptions){ marked.setOptions({gfm:true,breaks:false}); }
+    return DOMPurify.sanitize(marked.parse(src));
+  }catch(e){ return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+}
+
+
+
+const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null&&x!=='')e.textContent=x;return e};
+const btn=(l,f)=>{const b=mk('button','sb',l);b.onclick=f;return b};
+const pill=(l,f,p)=>{const b=mk('button','pl'+(p?' p':''),l);
+const ico=a=>a&&a.k==='img'?'🖼️ ':a&&a.k==='pdf'?'📄 ':'📎 ';b.onclick=f;return b};
+
+
+
+const LS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const P={
+  anthropic:{n:'Anthropic (Claude)',u:'https://api.anthropic.com',m:'claude-sonnet-5-5'},
+  openai:{n:'OpenAI',u:'https://api.openai.com/v1',m:'gpt-4o'},
+  openrouter:{n:'OpenRouter',u:'https://openrouter.ai/api/v1',m:'anthropic/claude-sonnet-4.5'},
+  gemini:{n:'Google Gemini',u:'https://generativelanguage.googleapis.com/v1beta/openai',m:'gemini-2.5-flash'},
+  deepseek:{n:'DeepSeek',u:'https://api.deepseek.com',m:'deepseek-chat'},
+  custom:{n:'Другой (OpenAI-совместимый)',u:'',m:''}
+};
+const DRAW='Когда нужна картинка/схема — SVG в ```svg (белый фон, viewBox). График/дашборд — HTML в ```html (можно Chart.js CDN). Документ/отчёт — Markdown с таблицами. Когда нужно СОЗДАТЬ ФАЙЛ (код, скрипт, конфиг, .md, .txt, .py, .java, .c, .cpp, .js, .ts, .json, .csv и т.д.) — используй блок кода с именем файла: ```python:app.py или ```md:README.md — содержимое файла. После блока — кратко что делает файл.';
+let S={prov:'anthropic',key:'',url:'',proxy:'',model:'claude-sonnet-5-5',sys:'',...LS('cfg',{})};
+
+/* ---- Native Android bridge ---- */
+const isNative = !!(window.AndroidBridge);
+window.__nativePending = {};
+window.__nativeHttpDone = function(id, status, body) {
+  const p = window.__nativePending[id];
+  if (!p) return;
+  delete window.__nativePending[id];
+  p.resolve({ status: status, body: body, ok: status >= 200 && status < 300, text: async () => body });
+};
+window.__nativeHttpError = function(id, msg) {
+  const p = window.__nativePending[id];
+  if (!p) return;
+  delete window.__nativePending[id];
+  p.reject(new Error(msg || 'Network error'));
+};
+window.__nativeStreamChunk = function(id, data) {
+  const p = window.__nativePending[id];
+  if (p && p.onChunk) p.onChunk(data);
+};
+window.__nativeStreamDone = function(id) {
+  const p = window.__nativePending[id];
+  if (!p) return;
+  delete window.__nativePending[id];
+  if (p.onDone) p.onDone();
+  if (p.resolve) p.resolve();
+};
+window.__nativeStreamError = function(id, msg) {
+  const p = window.__nativePending[id];
+  if (!p) return;
+  delete window.__nativePending[id];
+  if (p.reject) p.reject(new Error(msg || 'Stream error'));
+};
+function nativeId(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+function nativeHttpPost(url, headers, body) {
+  return new Promise((resolve, reject) => {
+    const id = nativeId();
+    window.__nativePending[id] = { resolve, reject };
+    AndroidBridge.httpPost(id, url, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
+  });
+}
+function nativeHttpGet(url) {
+  return new Promise((resolve, reject) => {
+    const id = nativeId();
+    window.__nativePending[id] = { resolve, reject };
+    AndroidBridge.httpGet(id, url);
+  });
+}
+function nativeHttpGetWithHeaders(url, headers) {
+  return new Promise((resolve, reject) => {
+    const id = nativeId();
+    window.__nativePending[id] = { resolve, reject };
+    if (AndroidBridge.httpGetHeaders) AndroidBridge.httpGetHeaders(id, url, JSON.stringify(headers));
+    else AndroidBridge.httpGet(id, url);
+  }).then(r => ({ status: r.status, body: r.body, ok: r.ok }));
+}
+function nativePickFiles() {
+  return new Promise((resolve, reject) => {
+    if (!window.AndroidBridge || !AndroidBridge.pickFiles) {
+      reject(new Error('no-picker'));
+      return;
+    }
+    const id = nativeId();
+    window.__nativePending[id] = {
+      resolve: (payload) => {
+        try {
+          const arr = typeof payload === 'string' ? JSON.parse(payload) : payload;
+          resolve(arr || []);
+        } catch (e) { resolve([]); }
+      },
+      reject
+    };
+    AndroidBridge.pickFiles(id);
+  });
+}
+window.__nativeFilesPicked = function(id, json) {
+  const p = window.__nativePending[id];
+  if (!p) return;
+  delete window.__nativePending[id];
+  if (p.resolve) p.resolve(json);
+};
+function nativeStream(url, headers, body, onChunk) {
+  return new Promise((resolve, reject) => {
+    const id = nativeId();
+    window.__nativePending[id] = { onChunk: onChunk, onDone: resolve, resolve: resolve, reject: reject };
+    AndroidBridge.streamPost(id, url, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
+  });
+}
+
+/* ---- MCP Connectors ---- */
+let CX = LS('connectors', { github: { enabled: true, token: '', user: null }, custom: [] });
+if (!CX.github) CX.github = { enabled: true, token: '', user: null };
+if (!Array.isArray(CX.custom)) CX.custom = [];
+const saveCX = () => save('connectors', CX);
+let mcpEditId = null;
+
+const idb=()=>new Promise((ok,err)=>{const r=indexedDB.open('connector',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>err(r.error);});
+const kvGet=async k=>{try{const d=await idb();return await new Promise(ok=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ok()})}catch{return}};
+const kvSet=async(k,v)=>{try{const d=await idb();d.transaction('kv','readwrite').objectStore('kv').put(v,k)}catch{}};
+kvGet('pr').then(v=>{PR=v||[];try{list();render()}catch(e){}});
+kvGet('files').then(v=>{FILES=Array.isArray(v)?v:[];try{render()}catch(e){}});
+
+
+let tab='chat', cur=null, chats=LS('chats',[]), PR=[], FILES=[], att=[], run=false, stop=false, rd=null, stat='', toolLoops=0, np=null, fp=null, pv=null, sideAll=false, qs='', raf=0, ep={};
+const saveFiles=()=>kvSet('files', FILES);
+function addLibFile(name, content, lang){
+  name=(name||'file.txt').replace(/[^\w.\-\u0400-\u04FF]+/g,'_');
+  const id='f_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const item={id,n:name,lang:lang||'',d:content||'',ts:Date.now()};
+  FILES.unshift(item); if(FILES.length>200) FILES.length=200;
+  saveFiles(); return item;
+}
+
+const GH_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>';
+const MCP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>';
+
+function renderConnectors() {
+  const box = $('#inner'); box.textContent = '';
+  $('#ttl').textContent = 'Коннекторы';
+  $('#mod').textContent = S.model || 'Настройки';
+  box.append(mk('p', 'muted', 'Подключите сервисы — модель сможет использовать их как инструменты (MCP).'));
+  box.append(mk('div', 'conn-sec', 'Встроенные'));
+  const list = mk('div', 'conn-list');
+  const gh = CX.github || {};
+  const connected = !!(gh.token && gh.user);
+  const card = mk('div', 'conn-card');
+  const top = mk('div', 'conn-top');
+  const icon = mk('div', 'conn-icon'); icon.innerHTML = GH_ICON;
+  const body = mk('div', 'conn-body');
+  body.append(mk('div', 'conn-name', 'GitHub'));
+  const st = mk('div', 'conn-status' + (connected ? ' on' : ''));
+  st.textContent = connected ? ('Подключен как @' + gh.user) : 'Предустановлен · нужна авторизация';
+  body.append(st);
+  top.append(icon, body);
+  const actions = mk('div', 'conn-actions');
+  if (connected) {
+    actions.append(mk('span', 'conn-badge', 'Активен'));
+    actions.append(btn('Отключить', () => { CX.github = { enabled: true, token: '', user: null }; saveCX(); renderConnectors(); }));
+  } else {
+    actions.append(pill('Подключить', () => { $('#ghToken').value = ''; $('#ghAuthErr').style.display = 'none'; $('#ghAuth').showModal(); }, 1));
+  }
+  card.append(top, actions);
+  list.append(card);
+  box.append(list);
+  box.append(mk('div', 'conn-sec', 'Ваши MCP'));
+  const customList = mk('div', 'conn-list');
+  if (!CX.custom.length) customList.append(mk('p', 'muted', 'Пока нет своих коннекторов. Добавьте HTTP MCP endpoint.'));
+  CX.custom.forEach(c => {
+    const cc = mk('div', 'conn-card');
+    const ct = mk('div', 'conn-top');
+    const ci = mk('div', 'conn-icon'); ci.innerHTML = MCP_ICON;
+    const cb = mk('div', 'conn-body');
+    cb.append(mk('div', 'conn-name', c.name || 'MCP'));
+    const cs = mk('div', 'conn-status' + (c.enabled !== false ? ' on' : ''));
+    cs.textContent = (c.enabled === false ? 'Выключен · ' : '') + (c.url || '');
+    cb.append(cs); ct.append(ci, cb);
+    const ca = mk('div', 'conn-actions');
+    ca.append(mk('span', 'conn-badge' + (c.enabled === false ? ' off' : ''), c.enabled === false ? 'Выкл' : 'Активен'));
+    ca.append(btn(c.enabled === false ? 'Включить' : 'Выключить', () => { c.enabled = c.enabled === false; saveCX(); renderConnectors(); }));
+    ca.append(btn('Изменить', () => openMcpEditor(c)));
+    ca.append(btn('Удалить', () => { CX.custom = CX.custom.filter(x => x.id !== c.id); saveCX(); renderConnectors(); }));
+    cc.append(ct, ca); customList.append(cc);
+  });
+  box.append(customList);
+  const addRow = mk('div', 'acts'); addRow.style.marginTop = '16px';
+  addRow.append(pill('+ Добавить MCP', () => openMcpEditor(null), 1));
+  box.append(addRow);
+}
+function openMcpEditor(c) {
+  mcpEditId = c ? c.id : null;
+  $('#mcpAuthTitle').textContent = c ? 'Изменить MCP' : 'Свой MCP';
+  $('#mcpName').value = c ? (c.name || '') : '';
+  $('#mcpUrl').value = c ? (c.url || '') : '';
+  $('#mcpToken').value = c ? (c.token || '') : '';
+  $('#mcpAuthErr').style.display = 'none';
+  $('#mcpAuth').showModal();
+}
+function saveMcpConnector() {
+  const name = ($('#mcpName').value || '').trim();
+  const url = ($('#mcpUrl').value || '').trim().replace(/\/$/, '');
+  const token = ($('#mcpToken').value || '').trim();
+  const err = $('#mcpAuthErr'); err.style.display = 'none';
+  if (!name) { err.textContent = 'Укажите название'; err.style.display = 'block'; return; }
+  if (!url || !/^https?:\/\//i.test(url)) { err.textContent = 'Укажите корректный URL (http/https)'; err.style.display = 'block'; return; }
+  if (mcpEditId) {
+    const c = CX.custom.find(x => x.id === mcpEditId);
+    if (c) { c.name = name; c.url = url; c.token = token; }
+  } else {
+    CX.custom.push({ id: 'mcp_' + Date.now().toString(36), name, url, token, enabled: true });
+  }
+  saveCX(); $('#mcpAuth').close(); renderConnectors();
+}
+async function connectGitHub() {
+  const token = ($('#ghToken').value || '').trim();
+  const err = $('#ghAuthErr'); err.style.display = 'none';
+  if (!token) { err.textContent = 'Вставьте token'; err.style.display = 'block'; return; }
+  const btnEl = $('#ghAuthV'); btnEl.disabled = true; btnEl.textContent = 'Проверка…';
+  try {
+    let user;
+    if (isNative) {
+      const res = await nativeHttpGetWithHeaders('https://api.github.com/user', {
+        'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'User-Agent': 'Connector-App'
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' — token недействителен');
+      user = JSON.parse(res.body);
+    } else {
+      const r = await fetch('https://api.github.com/user', {
+        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'User-Agent': 'Connector-App' }
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' — token недействителен');
+      user = await r.json();
+    }
+    CX.github = { enabled: true, token: token, user: user.login || user.name || 'user' };
+    saveCX(); $('#ghAuth').close(); renderConnectors();
+  } catch (e) {
+    err.textContent = e.message || 'Ошибка авторизации'; err.style.display = 'block';
+  } finally {
+    btnEl.disabled = false; btnEl.textContent = 'Подключить';
+  }
+}
+function renderLibrary(){
+  const box=$('#inner'); box.textContent='';
+  $('#ttl').textContent='Библиотека';
+  $('#mod').textContent=S.model||'Настройки';
+  box.append(mk('h2','pt','Библиотека'));
+  box.append(mk('p','muted','Файлы из ответов модели: код, документы, таблицы.'));
+  const head=mk('div','ph2');
+  head.append(pill('Создать текстовый',()=>{
+    openSaveFileDialog('notes.md', '', 'markdown');
+  },1));
+  box.append(head);
+  if(!FILES.length){
+    box.append(mk('p','muted','Пока пусто. В ответе нажмите «В библиотеку» на блоке кода.'));
+  }
+  FILES.forEach(f=>{
+    const row=mk('div','lib-item');
+    const meta=mk('div','meta');
+    meta.append(mk('b','', f.n||'file'));
+    const dt = f.ts ? new Date(f.ts).toLocaleString() : '';
+    const bits = [f.lang||'', dt, (f.d?f.d.length:0)+' симв.'].filter(Boolean);
+    meta.append(mk('small','', bits.join(' · ')));
+    row.append(meta);
+    const actions=mk('div','lib-actions');
+    actions.append(btn('Открыть',()=>{
+      const esc=String(f.d||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      openArt('<pre style="white-space:pre-wrap;font:13px ui-monospace,Menlo,monospace;padding:16px;margin:0;background:#0a0a0a;color:#f5f5f5">'+esc+'</pre>');
+    }));
+    actions.append(btn('Копировать',async()=>{
+      try{ await navigator.clipboard.writeText(f.d||''); }catch(e){}
+    }));
+    actions.append(btn('Удалить',()=>{
+      if(!confirm('Удалить «'+(f.n||'файл')+'»?')) return;
+      FILES=FILES.filter(x=>x.id!==f.id); saveFiles(); renderLibrary();
+    }));
+    row.append(actions);
+    box.append(row);
+  });
+  const pfiles=[];
+  (PR||[]).forEach(p=>{(p.files||[]).forEach(f=>pfiles.push({f,p}));});
+  if(pfiles.length){
+    box.append(mk('div','conn-sec','Файлы проектов'));
+    pfiles.forEach(({f,p})=>{
+      const card=mk('div','card gl');
+      card.append(mk('b','',ico(f)+' '+(f.n||'файл')));
+      card.append(mk('small','','Проект: '+(p?p.name:'')));
+      box.append(card);
+    });
+  }
+}
+
+
+function addLibFile_dup(name,content,lang){
+  name=(name||'file.txt').replace(/[^\w.\-\u0400-\u04FF]+/g,'_');
+  const id='f_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const item={id,n:name,lang:lang||'',d:content||'',ts:Date.now()};
+  FILES.unshift(item); if(FILES.length>200) FILES.length=200;
+  saveFiles(); return item;
+}
+
+const prj=id=>PR.find(p=>p.id==id);
+function persist(){
+  save('chats',chats.map(c=>({...c,msgs:c.msgs.map(m=>({...m,a:(m.a||[]).map(a=>a.k=='txt'?a:{k:a.k,n:a.n,d:''})}))})));
+}
+
+/* ---------- файлы ---------- */
+const readF=f=>new Promise(res=>{
+  if(!f) return res(null);
+  if(f.size>20e6){alert((f.name||'file')+': файл больше 20 МБ');return res(null)}
+  const name=(f.name||'file').toLowerCase();
+  const r=new FileReader();
+  const i=(f.type||'').startsWith('image/')||/\.(png|jpe?g|gif|webp|bmp|heic)$/i.test(name);
+  const p=(f.type==='application/pdf')||/\.pdf$/i.test(name);
+  r.onload=()=>{
+    try{
+      if(i||p){
+        const dataUrl=String(r.result||'');
+        const b64=dataUrl.includes(',')?dataUrl.split(',')[1]:dataUrl;
+        res({k:p?'pdf':'img',n:f.name||(p?'file.pdf':'image.png'),mt:f.type||(p?'application/pdf':'image/png'),d:b64});
+      }else{
+        res({k:'txt',n:f.name||'file.txt',d:String(r.result||'')});
+      }
+    }catch(e){res(null)}
+  };
+  r.onerror=()=>res(null);
+  if(i||p) r.readAsDataURL(f); else r.readAsText(f);
+});
+async function addFiles(fs,arr,done){for(const f of fs){const a=await readF(f);if(a)arr.push(a)}done()}
+
+function renderAtt(){
+  const b=$('#atts');b.textContent='';
+  att.forEach((a,i)=>{const c=mk('span','cf',ico(a)+a.n+'  ✕');c.onclick=()=>{att.splice(i,1);renderAtt()};b.append(c)});
+}
+function renderPF(){
+  const l=$('#pfl');l.textContent='';
+  if(!ep.files.length)l.append(mk('div','pfi','Файлов пока нет'));
+  ep.files.forEach((a,i)=>{
+    const r=mk('div','pfi');r.append(mk('span','',ico(a)+a.n));
+    const x=btn('Удалить',()=>{ep.files.splice(i,1);renderPF()});r.append(x);l.append(r);
+  });
+}
+async function pickAndAttach(){
+  if (isNative && window.AndroidBridge && AndroidBridge.pickFiles) {
+    try {
+      const files = await nativePickFiles();
+      // files: [{n, mt, d(base64), k}]
+      (files || []).forEach(a => {
+        if (!a || !a.d) return;
+        const name = (a.n || '').toLowerCase();
+        const isImg = (a.mt || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp)$/i.test(name);
+        const isPdf = a.mt === 'application/pdf' || /\.pdf$/i.test(name);
+        att.push({
+          k: isPdf ? 'pdf' : (isImg ? 'img' : 'txt'),
+          n: a.n || 'file',
+          mt: a.mt || '',
+          d: a.d
+        });
+      });
+      renderAtt();
+      return;
+    } catch (e) {
+      console.warn('native pick failed', e);
+    }
+  }
+  const el = $('#file');
+  if (el) el.click();
+}
+$('#file').onchange=e=>{
+  const fs=[...(e.target.files||[])];
+  if(fs.length) addFiles(fs,att,()=>{renderAtt();});
+  e.target.value='';
+};
+$('#fileP').onchange=e=>{addFiles([...e.target.files],ep.files,renderPF);e.target.value=''};
+$('#in').addEventListener('paste',e=>{
+  const fs=[...((e.clipboardData&&e.clipboardData.files)||[])];
+  if(fs.length){e.preventDefault();addFiles(fs,att,renderAtt)}
+});
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{e.preventDefault();const fs=[...((e.dataTransfer&&e.dataTransfer.files)||[])];if(fs.length)addFiles(fs,att,renderAtt)});
+function editP(p){
+  ep=p?{...p,files:[...p.files]}:{id:Date.now(),name:'',sys:'',files:[]};
+  $('#pT').textContent=p?'Проект':'Новый проект';$('#pN').value=ep.name;$('#pS').value=ep.sys;$('#pD').hidden=!p;
+  renderPF();$('#pf').showModal();closeSide();
+}
+$('#pV').onclick=()=>{
+  const n=$('#pN').value.trim();if(!n){$('#pN').focus();return}
+  ep.name=n;ep.sys=$('#pS').value;
+  const i=PR.findIndex(p=>p.id==ep.id);if(i<0)PR.push(ep);else PR[i]=ep;
+  kvSet('pr',PR);$('#pf').close();list();render();
+};
+$('#pD').onclick=()=>{
+  if(!confirm('Удалить проект «'+ep.name+'» вместе с файлами? Чаты проекта останутся.'))return;
+  PR=PR.filter(p=>p.id!=ep.id);chats.forEach(c=>{if(c.pid==ep.id)delete c.pid});
+  if(np==ep.id)np=null;if(pv==ep.id)pv=null;kvSet('pr',PR);persist();$('#pf').close();list();render();
+};
+$('#pA').onclick=()=>$('#fileP').click();
+$('#pX').onclick=()=>$('#pf').close();
+
+/* ---------- сообщения ---------- */
+const blk=(a,an)=>{
+  if(a.k=='img')return an?{type:'image',source:{type:'base64',media_type:a.mt,data:a.d}}:{type:'image_url',image_url:{url:'data:'+a.mt+';base64,'+a.d}};
+  if(a.k=='pdf')return an?{type:'document',source:{type:'base64',media_type:'application/pdf',data:a.d}}:null;
+  return{type:'text',text:'<file name="'+a.n+'">\n'+a.d+'\n</file>'};
+};
+const toM=(m,an)=>{
+  if(m.r=='assistant')return{role:'assistant',content:m.t};
+  const c=(m.a||[]).filter(a=>a.d).map(a=>blk(a,an)).filter(Boolean);
+  c.push({type:'text',text:m.t||'(см. вложения)'});
+  return{role:'user',content:c};
+};
+function lines(txt){
+  const o=[];
+  for(const l of txt.split('\n')){
+    if(!l.startsWith('data:'))continue;
+    const d=l.slice(5).trim();
+    if(d&&d!='[DONE]'){try{o.push(JSON.parse(d))}catch{}}
+  }
+  return o;
+}
+async function* sse(res){
+  if(!res.body||!res.body.getReader){for(const j of lines(await res.text()))yield j;return}
+  rd=res.body.getReader();const dc=new TextDecoder();let b='';
+  for(;;){
+    const{done,value}=await rd.read();if(done)break;
+    b+=dc.decode(value,{stream:true});
+    const i=b.lastIndexOf('\n');if(i<0)continue;
+    const ch=b.slice(0,i);b=b.slice(i+1);
+    for(const j of lines(ch))yield j;
+  }
+}
+/* ---------- веб-поиск через DuckDuckGo (без Jina) ---------- */
+const WEB_TOOL = `У тебя есть доступ к интернету через инструменты.
+Когда нужны свежие данные (курс валют/крипты, новости, факты) — НЕ выдумывай.
+Сначала попробуй точечный источник, если уместно:
+- курс bitcoin/ETH в USD: <web_fetch>
+url: https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd
+</web_fetch>
+Иначе поиск:
+<web_search>
+query: краткий запрос на английском или русском
+</web_search>
+или чтение страницы:
+<web_fetch>
+url: https://...
+</web_fetch>
+В сообщении с вызовом инструмента не пиши обычный текст — только один XML-блок.`;
+
+
+async function ddgSearch(q){
+  const query = (q || '').trim();
+  if(!query) return 'Пустой запрос.';
+  // Crypto shortcuts
+  if(/биткоин|bitcoin|btc|эфир|ethereum|eth/i.test(query) && /курс|цена|price|сколько/i.test(query)){
+    try{
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,rub';
+      let data;
+      if(isNative){ const r = await nativeHttpGet(url); data = JSON.parse(r.body||'{}'); }
+      else { const r = await fetch(url); data = await r.json(); }
+      const lines = [];
+      if(data.bitcoin) lines.push('Bitcoin (BTC): $' + data.bitcoin.usd + (data.bitcoin.rub ? ' · ' + Math.round(data.bitcoin.rub) + ' ₽' : ''));
+      if(data.ethereum) lines.push('Ethereum (ETH): $' + data.ethereum.usd + (data.ethereum.rub ? ' · ' + Math.round(data.ethereum.rub) + ' ₽' : ''));
+      if(lines.length) return 'Источник: CoinGecko\n' + lines.join('\n');
+    }catch(e){ /* fall through */ }
+  }
+  try{
+    const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1';
+    let data;
+    if(isNative){ const r = await nativeHttpGet(url); data = JSON.parse(r.body||'{}'); }
+    else { const r = await fetch(url); data = await r.json(); }
+    const out = [];
+    if(data.Heading) out.push('Тема: ' + data.Heading);
+    if(data.AbstractText) out.push(data.AbstractText);
+    if(data.AbstractURL) out.push('URL: ' + data.AbstractURL);
+    (data.RelatedTopics||[]).slice(0,6).forEach(t=>{
+      if(t.Text) out.push('• ' + t.Text);
+      else if(t.Topics) t.Topics.slice(0,2).forEach(x=>{ if(x.Text) out.push('• ' + x.Text); });
+    });
+    if(out.length) return out.join('\n');
+  }catch(e){}
+  // Fallback: HTML lite via native
+  try{
+    const url = 'https://duckduckgo.com/html/?q=' + encodeURIComponent(query);
+    let body;
+    if(isNative){ const r = await nativeHttpGet(url); body = r.body||''; }
+    else { const r = await fetch(url); body = await r.text(); }
+    const texts = [];
+    const re = /class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
+    let m; let i=0;
+    while((m = re.exec(body)) && i<5){
+      const t = m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+      if(t) { texts.push('• ' + t); i++; }
+    }
+    if(texts.length) return texts.join('\n');
+  }catch(e){}
+  return 'Поиск не нашёл результатов по запросу «' + query + '». Попробуй переформулировать или указать источник.';
+}
+
+async function fetchPage(url){
+  url = (url||'').trim();
+  if(!/^https?:\/\//i.test(url)) return 'Некорректный URL.';
+  try{
+    // Пробуем через allorigins (публичный CORS-прокси)
+    const r = await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));
+    if(!r.ok) throw new Error(r.status);
+    let txt = await r.text();
+    // Грубая очистка HTML → текст
+    txt = txt.replace(/<script[\s\S]*?<\/script>/gi,' ')
+             .replace(/<style[\s\S]*?<\/style>/gi,' ')
+             .replace(/<[^>]+>/g,' ')
+             .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+             .replace(/\s+/g,' ').trim();
+    return 'Содержимое страницы '+url+' (обрезано до 12000 символов):\n\n'+txt.slice(0,12000);
+  }catch(e){
+    return 'Не удалось прочитать страницу '+url+': '+e.message+'. Попробуй другой URL или поисковый запрос.';
+  }
+}
+
+function parseToolCall(text){
+  if(!text) return null;
+  const search = text.match(/<web_search>\s*query:\s*([\s\S]*?)\s*<\/web_search>/i);
+  if(search) return {type:'search', q:search[1].trim()};
+  const fetchm = text.match(/<web_fetch>\s*url:\s*([\s\S]*?)\s*<\/web_fetch>/i);
+  if(fetchm) return {type:'fetch', url:fetchm[1].trim()};
+  // Более свободный формат на всякий случай
+  const search2 = text.match(/<web_search>([\s\S]*?)<\/web_search>/i);
+  if(search2) return {type:'search', q:search2[1].replace(/query:\s*/i,'').trim()};
+  const fetch2 = text.match(/<web_fetch>([\s\S]*?)<\/web_fetch>/i);
+  if(fetch2) return {type:'fetch', url:fetch2[1].replace(/url:\s*/i,'').trim()};
+  return null;
+}
+
+async function gen(){
+  const am={r:'assistant',t:''};
+  cur.msgs.push(am);run=true;stop=false;rd=null;busy(1);render();
+  const an=S.prov=='anthropic';
+  const hist=cur.msgs.slice(0,-1).filter(m=>m.r=='user'||m.r=='system_tool'||(m.r=='assistant'&&m.t&&!m.err));
+  const ms=hist.map(m=>m.r==='system_tool'?{role:'user',content:an?[{type:'text',text:'[Результат инструмента: '+(m.kind||'')+']\n'+m.t}]:('[Результат инструмента: '+(m.kind||'')+']\n'+m.t)}:toM(m,an)),first=ms.find(m=>m.role=='user');
+  const pj=prj(cur.pid),pf=(pj?pj.files:[]).filter(a=>a.d).map(a=>blk(a,an)).filter(Boolean);
+  if(first&&pf.length)first.content.unshift(...pf);
+  const sys=[S.sys.trim(),pj&&pj.sys.trim(),DRAW,WEB_TOOL,'Если нужно коротко показать ход мысли — оберни в <thinking>...</thinking> (это свернётся в блок «Размышление»).',pf.length?'В начале первого сообщения прикреплены файлы проекта: используй их как контекст.':''].filter(Boolean).join('\n\n');
+  try{
+    // file:// почти всегда ломает CORS (Origin: null)
+    if(location.protocol==='file:' && !isNative){
+      throw new Error('Страница открыта как локальный файл (file://). Браузер блокирует запросы к API.\n\nРешение:\n1. Откройте папку с этим HTML в терминале\n2. Выполните: python3 -m http.server 8080\n3. Зайдите в браузере на http://localhost:8080/chat.html\n\nИли используйте расширение Live Server / любой другой локальный веб-сервер.');
+    }
+    let res;
+    // Реальный адрес провайдера
+    let target = an
+      ? (S.url || P.anthropic.u).replace(/\/$/,'') + '/v1/messages'
+      : (S.url || (P[S.prov]||{}).u || '').replace(/\/$/,'') + '/chat/completions';
+
+    // Если указан CORS-прокси (Cloudflare Worker) — идём через него
+    let url = target;
+    if (!isNative && S.proxy) {
+      url = S.proxy + (S.proxy.includes('?') ? '&' : '?') + 'url=' + encodeURIComponent(target);
+    }
+
+    const hd = an
+      ? {'content-type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}
+      : {'content-type':'application/json','authorization':'Bearer '+S.key};
+
+    const body = an
+      ? {model:S.model,max_tokens:8192,stream:true,system:sys,messages:ms}
+      : {model:S.model,stream:true,messages:[{role:'system',content:sys},...ms]};
+
+    const pick=j=>an?(j.type=='content_block_delta'&&j.delta&&(j.delta.type=='text_delta'||j.delta.text)?(j.delta.text||''):''):(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content||'');
+    const pickFull=j=>an?(j.content||[]).map(x=>x.text||'').join(''):(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content||'');
+    const bodyStream = Object.assign({}, body, {stream: true});
+    const bodyOnce = Object.assign({}, body, {stream: false});
+
+    if (isNative) {
+      // Нативный OkHttp: стрим, при ошибке — one-shot
+      try {
+        await nativeStream(url, hd, bodyStream, (data) => {
+          if (stop || data === '[DONE]') return;
+          try {
+            const j = JSON.parse(data);
+            if (j.type === 'error') throw new Error((j.error && j.error.message) || 'ошибка API');
+            const d = pick(j);
+            if (d) { am.t += d; paint(); }
+          } catch (e) {
+            if (e && e.message && /ошибка API/i.test(e.message)) throw e;
+          }
+        });
+      } catch (streamErr) {
+        if (stop) throw streamErr;
+        const res = await nativeHttpPost(url, hd, bodyOnce);
+        if (!res.ok) throw new Error(res.status + ' ' + String(res.body).slice(0, 400));
+        let j = null;
+        try { j = JSON.parse(res.body); } catch (_) {}
+        if (j) am.t = pickFull(j);
+        else am.t = res.body || '';
+        paint();
+      }
+    } else {
+      const go = st => {
+        const b = Object.assign({}, body, {stream: st});
+        return fetch(url, {method:'POST', headers:hd, body: JSON.stringify(b)});
+      };
+      let res, ns=false;
+      try{res=await go(true)}catch(e){
+        try{res=await go(false);ns=true}catch(e2){
+          let h=url;try{h=new URL(url).host}catch{}
+          const msg=(e2&&e2.message)||(e&&e.message)||'Failed to fetch';
+          throw new Error('не удалось подключиться к '+h+' ('+msg+').');
+        }
+      }
+      if(!res.ok)throw new Error(res.status+' '+(await res.text()).slice(0,400));
+      if(ns){
+        const tx=await res.text();let j=null;try{j=JSON.parse(tx)}catch{}
+        if(j)am.t=pickFull(j);
+        else for(const e of lines(tx))am.t+=pick(e);
+        paint();
+      }else for await(const j of sse(res)){
+        if(stop)break;
+        if(j.type=='error')throw new Error(j.error&&j.error.message||'ошибка API');
+        const d=pick(j);
+        if(d){am.t+=d;paint()}
+      }
+    }
+  }catch(e){
+    if(!stop){am.t+=(am.t?'\n\n':'')+'Ошибка: '+e.message;am.err=1}
+  }
+
+  // --- Обработка tool-call от модели ---
+  if(!stop && am.t && !am.err && toolLoops < 4){
+    const call = parseToolCall(am.t);
+    if(call){
+      toolLoops++;
+      stat = call.type==='search' ? 'Ищу в DuckDuckGo…' : 'Читаю страницу…';
+      render();
+      let resultText = '';
+      try{
+        if(call.type==='search') resultText = await ddgSearch(call.q);
+        else resultText = await fetchPage(call.url);
+      }catch(e){ resultText = 'Ошибка инструмента: '+e.message; }
+      stat = '';
+      // Добавляем результат как сообщение пользователя (модель увидит его в следующем ходе)
+      // Скрываем «сырой» вызов инструмента из ответа ассистента
+      am.t = am.t.replace(/<web_search>[\s\S]*?<\/web_search>/gi,'').replace(/<web_fetch>[\s\S]*?<\/web_fetch>/gi,'').trim();
+      if(!am.t) am.t = '';
+      am.tools = am.tools || [];
+      am.tools.push({kind: call.type, q: call.q || call.url || '', text: resultText});
+      // если после strip текст пустой — не оставляем «Думаю» на этом сообщении
+      if (!am.t) am.t = ' ';
+      cur.msgs.push({r:'system_tool', t: resultText, kind: call.type, q: call.q || call.url || ''});
+      stat = '';
+      persist();
+      render();
+      return gen();
+    }
+  }
+  toolLoops = 0;
+
+  if(!am.t || am.t===' '){ if(!(am.tools&&am.tools.length)) cur.msgs.pop(); else if(am.t===' ') am.t=''; }
+  stat='';run=false;rd=null;busy(0);persist();render();list();
+}
+async function send(){
+  if(run){stop=true;if(rd)rd.cancel().catch(()=>{});return}
+  const t=$('#in').value.trim();
+  if(!t&&!att.length)return;
+  if(!S.key){openSet();return}
+  if(!cur){cur={id:Date.now(),title:(t||att[0].n).slice(0,48),msgs:[],pid:np};chats.unshift(cur)}
+  cur.msgs.push({r:'user',t,a:att});att=[];
+  $('#in').value='';fit();renderAtt();list();gen();
+}
+const regen=()=>{if(run)return;cur.msgs.pop();gen()};
+
+/* ---------- отображение ---------- */
+const svgUri=c=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(c);
+function png(code){
+  const i=new Image();
+  i.onload=()=>{
+    const w=i.naturalWidth||800,h=i.naturalHeight||800,k=Math.max(1,1600/Math.max(w,h)),c=mk('canvas');
+    c.width=Math.round(w*k);c.height=Math.round(h*k);
+    c.getContext('2d').drawImage(i,0,0,c.width,c.height);
+    c.toBlob(b=>dl(b,'drawing.png'));
+  };
+  i.src=svgUri(code);
+}
+function parseCodeMeta(cls, code){
+  // language-python:app.py or language-python
+  let lang='', fname='';
+  const m=(cls||'').match(/language-([\w+-]+)(?::([\w.\-]+))?/);
+  if(m){ lang=m[1]||''; fname=m[2]||''; }
+  // first line: // file: name  or # file: name
+  if(!fname){
+    const fl=(code||'').split('\n')[0]||'';
+    const fm=fl.match(/(?:\/\/|#|--)\s*file:\s*([^\s]+)/i);
+    if(fm) fname=fm[1];
+  }
+  if(!fname && lang){
+    const map={python:'py',py:'py',javascript:'js',js:'js',typescript:'ts',ts:'ts',java:'java',c:'c',cpp:'cpp',csharp:'cs',go:'go',rust:'rs',ruby:'rb',php:'php',swift:'swift',kotlin:'kt',markdown:'md',md:'md',json:'json',yaml:'yml',html:'html',css:'css',sql:'sql',bash:'sh',shell:'sh',text:'txt',txt:'txt'};
+    const ext=map[lang.toLowerCase()]||lang.toLowerCase();
+    fname='file.'+ext;
+  }
+  return {lang, fname};
+}
+
+let _sfPending = null;
+function openSaveFileDialog(defaultName, content, lang){
+  _sfPending = { content: content||'', lang: lang||'' };
+  const err = $('#sfErr'); if(err){ err.style.display='none'; err.textContent=''; }
+  $('#sfName').value = defaultName || 'file.txt';
+  $('#sfLang').value = lang || '';
+  $('#saveFile').showModal();
+  setTimeout(()=>{ try{ $('#sfName').focus(); $('#sfName').select(); }catch(e){} }, 50);
+}
+function confirmSaveFile(){
+  const name = ($('#sfName').value||'').trim();
+  const lang = ($('#sfLang').value||'').trim();
+  const err = $('#sfErr');
+  if(!name){ if(err){ err.textContent='Укажите имя файла'; err.style.display='block'; } return; }
+  if(!_sfPending){ $('#saveFile').close(); return; }
+  addLibFile(name, _sfPending.content, lang || _sfPending.lang);
+  _sfPending = null;
+  $('#saveFile').close();
+}
+/* sf handlers bound at end */
+
+function parseCodeMeta(cls, code){
+  let lang='', fname='';
+  const m=(cls||'').match(/language-([\w+-]+)(?::([\w.\-]+))?/);
+  if(m){ lang=m[1]||''; fname=m[2]||''; }
+  if(!fname){
+    const fl=(code||'').split('\n')[0]||'';
+    const fm=fl.match(/(?:\/\/|#|--)\s*file:\s*([^\s]+)/i);
+    if(fm) fname=fm[1];
+  }
+  if(!fname && lang){
+    const map={python:'py',py:'py',javascript:'js',js:'js',typescript:'ts',ts:'ts',java:'java',c:'c',cpp:'cpp',csharp:'cs',go:'go',rust:'rs',ruby:'rb',php:'php',swift:'swift',kotlin:'kt',markdown:'md',md:'md',json:'json',yaml:'yml',html:'html',css:'css',sql:'sql',bash:'sh',shell:'sh',text:'txt',txt:'txt'};
+    const ext=map[lang.toLowerCase()]||lang.toLowerCase();
+    fname='file.'+ext;
+  }
+  return {lang, fname};
+}
+function enh(root){
+  root.querySelectorAll('pre').forEach(p=>{
+    const c=p.querySelector('code'); if(!c || p.dataset.done) return;
+    p.dataset.done='1';
+    let code=c.textContent||'';
+    const meta=parseCodeMeta(c.className, code);
+    const lang=meta.lang, fname=meta.fname;
+    if(/^(\/\/|#|--)\s*file:\s*\S+/i.test((code.split('\n')[0]||''))){
+      code=code.split('\n').slice(1).join('\n');
+      c.textContent=code;
+    }
+    if(lang==='svg'){
+      const f=mk('figure','svgf');
+      const img=new Image();
+      img.alt='svg'; img.style.maxWidth='100%'; img.style.height='auto'; img.style.background='#fff';
+      let svg=code;
+      if(!/background/i.test(svg)) svg=svg.replace(/<svg\b([^>]*)>/i,'<svg$1 style="background:#fff">');
+      img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      f.append(img); p.replaceWith(f); return;
+    }
+    if(lang==='html' || lang==='htm'){
+      const wrap=mk('div','viz-frame');
+      const bar2=mk('div','viz-bar');
+      bar2.append(mk('span','','Визуализация'));
+      bar2.append(btn('На весь экран',()=>openArt(code)));
+      const src=mk('pre'); src.hidden=true; src.append(mk('code','',code));
+      bar2.append(btn('Код',()=>{src.hidden=!src.hidden}));
+      const ifr=document.createElement('iframe');
+      ifr.setAttribute('sandbox','allow-scripts allow-same-origin');
+      const cssText='body{margin:12px;font-family:system-ui;background:#fff;color:#111}';
+      const shell='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><'+'style>'+cssText+'</'+'style></head><body>';
+      ifr.srcdoc=/<(?:html|!doctype)/i.test(code)?code:(shell+code+'</body></html>');
+      ifr.onload=function(){try{const h=ifr.contentDocument.body.scrollHeight;if(h>100)ifr.style.height=Math.min(Math.max(h+24,240),560)+'px'}catch(e){}};
+      wrap.append(bar2,ifr,src); p.replaceWith(wrap); return;
+    }
+    if(window.hljs){
+      try{
+        if(lang && hljs.getLanguage(lang)) c.innerHTML=hljs.highlight(code,{language:lang}).value;
+        else c.innerHTML=hljs.highlightAuto(code).value;
+        c.classList.add('hljs');
+      }catch(e){}
+    }
+    const bar=mk('div','cb');
+    bar.append(mk('span','lang',lang||'code'));
+    if(fname) bar.append(mk('span','fname',fname));
+    const spacer=mk('span',''); spacer.style.flex='1'; bar.append(spacer);
+    bar.append(btn('Копировать',e=>{navigator.clipboard.writeText(code);e.target.textContent='Скопировано'}));
+    bar.append(btn('В библиотеку',()=>{ openSaveFileDialog(fname||('file.'+(lang||'txt')), code, lang); }));
+    p.prepend(bar);
+  });
+}
+
+function node(m,i){
+  const last = i === cur.msgs.length - 1;
+  if (m.r === 'system_tool') {
+    const d = mk('div', 'm a');
+    const det = document.createElement('details');
+    det.className = 'tool-block';
+    det.open = false;
+    const sum = document.createElement('summary');
+    const tag = mk('span', 'tag', m.kind === 'fetch' ? 'Чтение страницы' : 'Поиск');
+    const q = mk('span', 'q', m.q ? String(m.q) : 'Результат инструмента');
+    sum.append(tag, q);
+    det.append(sum);
+    det.append(mk('div', 'body', m.t || ''));
+    d.append(det);
+    return d;
+  }
+  const d = mk('div', 'm ' + (m.r === 'user' ? 'u' : 'a'));
+  if (m.r === 'user') {
+    (m.a || []).forEach(a => d.append(mk('div', 'cf', ico(a) + (a.n || a.k))));
+    if (m.t) d.append(mk('div', 'bub', m.t));
+  } else {
+    const b = mk('div', 'md');
+    (m.tools || []).forEach(tb => {
+      const det = document.createElement('details');
+      det.className = 'tool-block';
+      det.open = false;
+      const sum = document.createElement('summary');
+      sum.append(mk('span', 'tag', tb.kind === 'fetch' ? 'Чтение страницы' : 'Поиск'));
+      sum.append(mk('span', 'q', tb.q ? String(tb.q) : ''));
+      det.append(sum);
+      det.append(mk('div', 'body', tb.text || ''));
+      b.append(det);
+    });
+    if (m.t) {
+      let text = m.t;
+      const thinks = [];
+      text = text.replace(/<thinking>([\s\S]*?)<\/thinking>/gi, (_, inner) => { thinks.push(inner.trim()); return ''; });
+      thinks.forEach(th => {
+        const det = document.createElement('details');
+        det.className = 'think-block';
+        det.open = false;
+        const sum = document.createElement('summary');
+        sum.append(mk('span', 'tag', 'Размышление'));
+        det.append(sum);
+        det.append(mk('div', 'body', th));
+        b.append(det);
+      });
+      text = text.trim();
+      if (text) {
+        const wrap = mk('div', '');
+        wrap.innerHTML = md(text);
+        enh(wrap);
+        b.append(wrap);
+      }
+    } else if (run && last && !(m.tools && m.tools.length)) {
+      // only show thinking on the active in-flight empty assistant message
+      const th = mk('div', 'thinking');
+      th.append(mk('span', 'txt', stat || 'Думаю'));
+      const dots = mk('span', 'dots');
+      dots.append(mk('i'), mk('i'), mk('i'));
+      th.append(dots);
+      b.append(th);
+    }
+    d.append(b);
+    if (m.t && !(run && last)) {
+      const r = mk('div', 'acts');
+      r.append(btn('Копировать', e => { navigator.clipboard.writeText(m.t); e.target.textContent = 'Скопировано'; }), btn('Озвучить', () => speak(m.t)));
+      if (last) r.append(btn('Повторить', regen));
+      d.append(r);
+    }
+  }
+  return d;
+}
+
+
+function render(){
+  const pj=tab=='projects', cn=tab=='connectors', lb=tab=='library';
+  $('#comp').hidden=pj||cn||lb;
+  $('#nP').classList.toggle('on',pj);
+  const nC=$('#nC'); if(nC) nC.classList.toggle('on',cn);
+  const nL=$('#nL'); if(nL) nL.classList.toggle('on',lb);
+  if(pj) renderProj();
+  else if(cn) renderConnectors();
+  else if(lb) renderLibrary();
+  else renderChat();
+
+  const modEl=$('#mod'); if(modEl) modEl.textContent=S.model||'Настройки';
+}
+function renderChat(){
+  const box=$('#inner');box.textContent='';
+  if(!cur||!cur.msgs.length){
+    const h=mk('div','hello','Чем могу помочь?');
+    const pj=prj(np);
+    let hint=(pj?'Проект: '+pj.name+'. ':'')+(S.key?'Модель: '+S.model:'Добавьте API-ключ: нажмите на название модели сверху');
+    if(location.protocol==='file:' && !isNative){
+      hint+='\n\n⚠️ Страница открыта как file:// — запросы к API будут блокироваться. Запустите локальный сервер:\npython3 -m http.server 8080\nи откройте http://localhost:8080';
+    }else if(S.prov&&S.prov!=='anthropic'&&S.prov!=='custom'){
+      hint+='\n\nПодсказка: OpenAI / DeepSeek / Gemini / OpenRouter обычно блокируют CORS из браузера. Надёжнее всего работает Anthropic.';
+    }
+    h.append(mk('small','',hint));
+    box.append(h);
+  }else cur.msgs.forEach((m,i)=>box.append(node(m,i)));
+  const cp=cur&&prj(cur.pid);$('#ttl').textContent=cur?(cp?cp.name+' / ':'')+cur.title:'';
+  $('#mod').textContent=S.model||'Настройки';
+  const s=$('#msgs');s.scrollTop=s.scrollHeight;
+}
+function paint(){
+  if(raf)return;
+  raf=requestAnimationFrame(()=>{
+    raf=0;const box=$('#inner'),s=$('#msgs');
+    const near=s.scrollHeight-s.scrollTop-s.clientHeight<140;
+    if(box.lastElementChild)box.lastElementChild.replaceWith(node(cur.msgs[cur.msgs.length-1],cur.msgs.length-1));
+    if(near)s.scrollTop=s.scrollHeight;
+  });
+}
+
+function renderProj(){
+  const box=$('#inner'),pj=prj(pv);box.textContent='';
+  $('#ttl').textContent=pj?pj.name:'Проекты';$('#mod').textContent=S.model||'Настройки';
+  if(!pj){
+    const h=mk('div','ph2');h.append(mk('h2','pt','Проекты'),pill('Новый проект',()=>editP(),1));box.append(h);
+    if(!PR.length)box.append(mk('p','muted','Проектов пока нет. В проекте хранятся инструкции и файлы, которые модель видит во всех его чатах.'));
+    PR.forEach(p=>{
+      const c=mk('div','card gl');
+      c.append(mk('b','',p.name),mk('small','','Файлов: '+p.files.length+', чатов: '+chats.filter(k=>k.pid==p.id).length));
+      c.onclick=()=>{pv=p.id;render()};box.append(c);
+    });
+  }else{
+    box.append(pill('← Проекты',()=>{pv=null;render()}),mk('h2','pt',pj.name));
+    if(pj.sys.trim())box.append(mk('p','muted',pj.sys.slice(0,240)));
+    box.append(mk('p','muted','Файлы: '+(pj.files.map(f=>f.n).join(', ')||'нет')));
+    const a=mk('div','acts');a.style.gap='8px';
+    a.append(pill('Новый чат',()=>{cur=null;np=pj.id;tab='chat';list();render()},1),pill('Изменить',()=>editP(pj)));box.append(a);
+    chats.filter(k=>k.pid==pj.id).forEach(k=>{
+      const c=mk('div','card gl',k.title);c.onclick=()=>{cur=k;np=k.pid;tab='chat';list();render()};box.append(c);
+    });
+  }
+  $('#msgs').scrollTop=0;
+}
+const spj=()=>tab=='chat'&&!sideAll?prj(cur?cur.pid:np):null;
+function press(el,c,pj){
+  let t,x0=0,y0=0,fired=0;
+  const cancel=()=>clearTimeout(t),show=()=>{fired=1;cmenu(c,pj)};
+  el.addEventListener('pointerdown',e=>{fired=0;x0=e.clientX;y0=e.clientY;t=setTimeout(show,500)});
+  el.addEventListener('pointermove',e=>{if(Math.abs(e.clientX-x0)+Math.abs(e.clientY-y0)>10)cancel()});
+  ['pointerup','pointerleave','pointercancel'].forEach(n=>el.addEventListener(n,cancel));
+  el.addEventListener('contextmenu',e=>{e.preventDefault();if(!fired)show()});
+  el.addEventListener('click',e=>{if(fired){e.stopImmediatePropagation();fired=0}},true);
+}
+function cmenu(c,pj){
+  if(run)return;
+  const d=$('#cm'),b=$('#cmb'),k=pj?'n':'title';b.textContent='';
+  const row=(l,f)=>{const x=mk('button','nv',l);x.onclick=f;b.append(x)};
+  const done=()=>{d.close();if(pj)kvSet('pr',PR);else persist();list();render()};
+  b.append(mk('b','cmt',c[k]));
+  row('Переименовать',()=>{
+    b.textContent='';const i=mk('input');i.value=c[k];b.append(i);
+    const ok=mk('button','pri','Сохранить');ok.onclick=()=>{c[k]=i.value.trim()||c[k];done()};b.append(ok);i.focus();
+  });
+  row('Переместить в проект',()=>{
+    b.textContent='';
+    const other=PR.filter(p=>p!==pj);
+    if(!pj)row('Без проекта',()=>{delete c.pid;done()});
+    other.forEach(p=>row(p.name,()=>{if(pj){pj.files=pj.files.filter(x=>x!==c);p.files.push(c)}else c.pid=p.id;done()}));
+    if(!other.length&&pj)b.append(mk('p','muted','Других проектов нет'));
+  });
+  row('Удалить',e=>{
+    if(e.target.dataset.s){if(pj)pj.files=pj.files.filter(x=>x!==c);else{chats=chats.filter(x=>x!==c);if(cur==c)cur=null}done()}
+    else{e.target.dataset.s=1;e.target.textContent='Нажмите ещё раз, чтобы удалить'}
+  });
+  row('Отмена',()=>d.close());
+  if(!d.open)d.showModal();
+}
+function item(c){
+  const r=mk('div','ci'+(tab=='chat'&&cur&&cur.id==c.id?' on':''));
+  r.append(mk('span','',c.title));
+  r.onclick=()=>{if(run)return;cur=c;np=c.pid||null;tab='chat';sideAll=false;list();render();closeSide()};
+  press(r,c);return r;
+}
+function list(){
+  const pj=spj();fp=pj?pj.id:null;
+  $('#nav').hidden=!!pj;$('#pm').hidden=!pj;
+  const l=$('#list');l.textContent='';
+  if(pj){
+    const m=$('#pm');m.textContent='';
+    m.append(pill('← Connector',()=>{sideAll=true;list()}),mk('h2','pt',pj.name));
+    const t=mk('div','tabs');
+    [['chats','Чаты'],['files','Файлы']].forEach(([k,n])=>{const b=mk('button','tab'+(pt==k?' on':''),n);b.onclick=()=>{pt=k;list()};t.append(b)});
+    m.append(t);
+    if(pt=='files'){
+      const a=pill('+ Добавить файлы',()=>$('#fileQ').click(),1);a.style.margin='0 0 8px';l.append(a);
+      l.append(mk('p','muted',pj.files.length?'Удерживайте файл, чтобы переименовать, переместить или удалить':'Файлов пока нет'));
+      pj.files.forEach((f,i)=>{
+        const r=mk('div','ci');r.append(mk('span','',ico(f)+f.n));press(r,f,pj);l.append(r);
+      });
+      return;
+    }
+  }
+  chats.filter(c=>(pj?c.pid==pj.id:!prj(c.pid))&&(!qs||c.title.toLowerCase().includes(qs))).forEach(c=>l.append(item(c)));
+}
+
+
+const busy=on=>{const g=$('#go');if(!g)return;g.innerHTML=on?(typeof SQ!=='undefined'?SQ:'■'):(typeof TRI!=='undefined'?TRI:'↑')};
+function fit(){const t=$('#in');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,200)+'px'}
+function openArt(code){$('#art iframe').srcdoc=code;$('#art').showModal()}
+$('#aX').onclick=()=>{$('#art').close();$('#art iframe').srcdoc=''};
+function speak(t){
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(t.replace(/```[\s\S]*?```/g,' ').replace(/[#*_`>]/g,'')));
+}
+
+/* ---------- настройки и макет ---------- */
+function openSet(){
+  $('#sP').innerHTML=Object.entries(P).map(([k,v])=>'<option value="'+k+'">'+v.n+'</option>').join('');
+  $('#sP').value=S.prov;$('#sK').value=S.key;$('#sM').value=S.model;$('#sU').value=S.url||'';
+  $('#sS').value=S.sys||'';
+  $('#set').showModal();
+}
+$('#sP').onchange=e=>{$('#sM').value=P[e.target.value].m;$('#sU').value=''};
+$('#sV').onclick=()=>{
+  S={
+    prov:$('#sP').value,
+    key:$('#sK').value.trim(),
+    model:$('#sM').value.trim(),
+    url:$('#sU').value.trim(),
+    proxy:'',
+    sys:$('#sS').value
+  };
+  save('cfg',S);$('#set').close();render();
+};
+$('#sX').onclick=()=>$('#set').close();
+$('#clr').onclick=()=>{if(confirm('Удалить все чаты?')){chats=[];cur=null;persist();list();render()}};
+// Кнопка веб-поиска больше не нужна — модель сама запрашивает инструмент
+if($('#web')) $('#web').style.display='none';
+const closeSide=()=>{ const s=$('#side'), c=$('#scrim'); if(s) s.classList.remove('open'); if(c) c.classList.remove('open'); document.body.classList.remove('side-open'); };
+$('#ghAuthX').onclick=()=>$('#ghAuth').close();
+$('#ghAuthV').onclick=()=>connectGitHub();
+$('#mcpAuthX').onclick=()=>$('#mcpAuth').close();
+$('#mcpAuthV').onclick=()=>saveMcpConnector();
+$('#fileQ').onchange=e=>{const pj=prj(fp);if(pj)addFiles([...e.target.files],pj.files,()=>{kvSet('pr',PR);list()});e.target.value=''};
+$('#sb').onclick=()=>{const q=$('#q');q.hidden=!q.hidden;if(q.hidden){q.value='';qs='';list()}else q.focus()};
+$('#q').oninput=e=>{qs=e.target.value.trim().toLowerCase();list()};
+$('#in').oninput=fit;
+$('#in').onkeydown=e=>{
+  if(e.key=='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();send()}
+};
+
+
+
+
+/* ---- bind UI (null-safe) ---- */
+(function bindUI(){
+  const on = (sel, fn) => { const el = $(sel); if (el) el.onclick = fn; };
+  on('#menu', ()=>{ sideAll=false; try{list()}catch(e){}; const s=$('#side'), c=$('#scrim'); if(s) s.classList.toggle('open'); if(c) c.classList.toggle('open'); document.body.classList.toggle('side-open', s&&s.classList.contains('open')); });
+  on('#scrim', ()=>{ try{ closeSide(); }catch(e){ const s=$('#side'), c=$('#scrim'); if(s)s.classList.remove('open'); if(c)c.classList.remove('open'); } document.body.classList.remove('side-open'); });
+  on('#mod', ()=>{ try{ openSet(); }catch(e){ console.error(e); } });
+  on('#go', ()=>{ try{ send(); }catch(e){ console.error(e); } });
+  on('#att', ()=>{ try{ pickAndAttach(); }catch(e){ console.error(e); } });
+  on('#new', ()=>{ if(run) return; cur=null; np=fp; tab='chat'; sideAll=false; try{list();render()}catch(e){}; try{closeSide()}catch(e){}; try{$('#in').focus()}catch(e){} });
+  on('#nP', ()=>{ if(run) return; tab='projects'; pv=null; try{list();render()}catch(e){}; try{closeSide()}catch(e){} });
+  on('#nC', ()=>{ tab='connectors'; try{list();render()}catch(e){}; try{closeSide()}catch(e){} });
+  on('#nL', ()=>{ tab='library'; try{list();render()}catch(e){}; try{closeSide()}catch(e){} });
+  on('#sfV', ()=>{ try{ confirmSaveFile(); }catch(e){} });
+  on('#sfX', ()=>{ _sfPending=null; try{ $('#saveFile').close(); }catch(e){} });
+  const sfName = $('#sfName');
+  if (sfName && sfName.addEventListener) sfName.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); try{ confirmSaveFile(); }catch(e){} } });
+  try{ busy(0); }catch(e){ const g=$('#go'); if(g) g.innerHTML = (typeof TRI!=='undefined'?TRI:'↑'); }
+})();
+
+
+
+/* Keyboard / visualViewport: pin shell to visible area; only chat scrolls */
+(function(){
+  const root = document.documentElement;
+  const body = document.body;
+  const msgs = () => document.getElementById('msgs');
+  const scrollChat = () => { const s = msgs(); if (s) s.scrollTop = s.scrollHeight; };
+
+  function syncViewport(){
+    const vv = window.visualViewport;
+    if (!vv) {
+      root.style.setProperty('--app-h', window.innerHeight + 'px');
+      return;
+    }
+    // Height of the visible area (above keyboard)
+    root.style.setProperty('--app-h', vv.height + 'px');
+    // When browser shifts the layout viewport, keep shell aligned
+    body.style.transform = ''; body.style.top = '0px';
+  }
+
+  syncViewport();
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', () => { syncViewport(); setTimeout(scrollChat, 50); });
+    visualViewport.addEventListener('scroll', syncViewport);
+  }
+  window.addEventListener('resize', syncViewport);
+  window.addEventListener('focusin', (e) => {
+    if (e.target && (e.target.id === 'in' || (e.target.closest && e.target.closest('#comp')))) {
+      setTimeout(syncViewport, 50);
+      setTimeout(scrollChat, 120);
+      setTimeout(scrollChat, 300);
+    }
+  });
+  window.addEventListener('focusout', () => {
+    setTimeout(syncViewport, 80);
+  });
+})();
+
+(function(){
+  function syncTheme(){
+    const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }
+  syncTheme();
+  try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme); }catch(e){
+    try{ window.matchMedia('(prefers-color-scheme: dark)').addListener(syncTheme); }catch(_){}
+  }
+})();
+
+try{busy(0);}catch(e){console.error(e);}
+try{list();}catch(e){console.error(e);}
+try{render();}catch(e){console.error(e);}
+
+
+
+</script>
+
+
+
+</body>
+</html>
